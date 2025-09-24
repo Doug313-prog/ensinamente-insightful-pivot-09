@@ -65,7 +65,7 @@ const Index = () => {
     setFilteredData(filtered);
   };
 
-  const handleGenerateReports = () => {
+  const handleGenerateConsolidatedReports = () => {
     if (filteredData.length === 0) {
       toast({
         title: "Aviso",
@@ -75,36 +75,51 @@ const Index = () => {
       return;
     }
 
-    // Se um cliente específico foi selecionado, gerar apenas relatórios cliente
-    // Se não, gerar relatórios consolidados por profissional
-    if (filters.cliente) {
-      generateAllReports(filteredData);
-    } else {
-      // Gerar relatórios consolidados por profissional
-      const professionalGroups = filteredData.reduce((acc, session) => {
-        if (!acc[session.profissional]) {
-          acc[session.profissional] = [];
-        }
-        acc[session.profissional].push(session);
-        return acc;
-      }, {} as Record<string, ProcessedData[]>);
+    // Gerar relatórios consolidados por profissional
+    const professionalGroups = filteredData.reduce((acc, session) => {
+      if (!acc[session.profissional]) {
+        acc[session.profissional] = [];
+      }
+      acc[session.profissional].push(session);
+      return acc;
+    }, {} as Record<string, ProcessedData[]>);
 
-      Object.entries(professionalGroups).forEach(([profissional, sessions]) => {
-        const clients = [...new Set(sessions.map(s => s.cliente))];
-        const summary = {
-          profissional,
-          totalSessions: sessions.length,
-          totalValue: sessions.reduce((sum, session) => sum + session.valorReceber, 0),
-          clients,
-          sessions
-        };
-        generateProfessionalReport(summary);
-      });
-    }
+    Object.entries(professionalGroups).forEach(([profissional, sessions]) => {
+      const clients = [...new Set(sessions.map(s => s.cliente))];
+      const summary = {
+        profissional,
+        totalSessions: sessions.length,
+        totalValue: sessions.reduce((sum, session) => sum + session.valorReceber, 0),
+        clients,
+        sessions
+      };
+      generateProfessionalReport(summary);
+    });
 
     toast({
+      title: "Relatórios Consolidados Gerados!",
+      description: "Os relatórios consolidados por profissional foram baixados.",
+    });
+  };
+
+  const handleGenerateIndividualReports = () => {
+    if (filteredData.length === 0) {
+      toast({
+        title: "Aviso",
+        description: "Nenhum dado disponível para gerar relatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Se um cliente específico foi selecionado, gerar apenas relatório desse cliente
+    // Se não, gerar todos os relatórios individuais
+    generateAllReports(filteredData);
+
+    const reportType = filters.cliente ? "individual" : "individuais";
+    toast({
       title: "Relatórios Gerados!",
-      description: "Os relatórios em PDF foram baixados automaticamente.",
+      description: `Os relatórios ${reportType} foram baixados automaticamente.`,
     });
   };
 
@@ -224,13 +239,37 @@ const Index = () => {
           </div>
           
           <div className="flex gap-3">
-            <Button
-              onClick={handleGenerateReports}
-              className="bg-gradient-secondary hover:shadow-elegant transition-all duration-300"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Gerar Relatórios PDF
-            </Button>
+            {/* Mostrar botões diferentes baseado na seleção de cliente */}
+            {filters.cliente ? (
+              // Cliente específico selecionado - apenas relatório individual
+              <Button
+                onClick={handleGenerateIndividualReports}
+                className="bg-gradient-secondary hover:shadow-elegant transition-all duration-300"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Gerar Relatório do Cliente
+              </Button>
+            ) : (
+              // Nenhum cliente específico - mostrar ambas opções
+              <>
+                <Button
+                  onClick={handleGenerateConsolidatedReports}
+                  className="bg-gradient-secondary hover:shadow-elegant transition-all duration-300"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Relatórios Consolidados
+                </Button>
+                
+                <Button
+                  onClick={handleGenerateIndividualReports}
+                  variant="outline"
+                  className="transition-all duration-200 hover:bg-muted"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Todos Relatórios Individuais
+                </Button>
+              </>
+            )}
 
             <Button
               onClick={handleGenerateMonthlyReport}
