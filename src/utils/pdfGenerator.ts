@@ -158,7 +158,7 @@ export const generateProfessionalReport = (summary: ProfessionalSummary): void =
   doc.save(fileName);
 };
 
-export const generateClientReports = (data: ProcessedData[]): void => {
+export const generateClientReports = async (data: ProcessedData[]): Promise<void> => {
   // Group by professional and then by client
   const professionalClients = data.reduce((acc, session) => {
     const key = `${session.profissional}|${session.cliente}`;
@@ -169,9 +169,10 @@ export const generateClientReports = (data: ProcessedData[]): void => {
     return acc;
   }, {} as Record<string, ProcessedData[]>);
 
-  Object.entries(professionalClients).forEach(([key, sessions]) => {
+  const entries = Object.entries(professionalClients);
+  for (const [key, sessions] of entries) {
     const [profissional, cliente] = key.split('|');
-    
+
     const summary: ProfessionalSummary = {
       profissional,
       totalSessions: sessions.length,
@@ -180,9 +181,10 @@ export const generateClientReports = (data: ProcessedData[]): void => {
       sessions
     };
 
-    // Generate report with professional + client name
     generateClientReport(summary, cliente);
-  });
+    // Aguarda 300ms entre downloads para evitar bloqueio do browser
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
 };
 
 export const generateClientReport = (summary: ProfessionalSummary, cliente: string): void => {
@@ -276,6 +278,6 @@ export const generateClientReport = (summary: ProfessionalSummary, cliente: stri
 };
 
 // Keep old function for backward compatibility
-export const generateAllReports = (data: ProcessedData[]): void => {
-  generateClientReports(data);
+export const generateAllReports = async (data: ProcessedData[]): Promise<void> => {
+  await generateClientReports(data);
 };

@@ -65,7 +65,7 @@ const Index = () => {
     setFilteredData(filtered);
   };
 
-  const handleGenerateConsolidatedReports = () => {
+  const handleGenerateConsolidatedReports = async () => {
     if (filteredData.length === 0) {
       toast({
         title: "Aviso",
@@ -84,7 +84,8 @@ const Index = () => {
       return acc;
     }, {} as Record<string, ProcessedData[]>);
 
-    Object.entries(professionalGroups).forEach(([profissional, sessions]) => {
+    const entries = Object.entries(professionalGroups);
+    for (const [profissional, sessions] of entries) {
       const clients = [...new Set(sessions.map(s => s.cliente))];
       const summary = {
         profissional,
@@ -94,7 +95,8 @@ const Index = () => {
         sessions
       };
       generateProfessionalReport(summary);
-    });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
 
     toast({
       title: "Relatórios Consolidados Gerados!",
@@ -102,7 +104,7 @@ const Index = () => {
     });
   };
 
-  const handleGenerateIndividualReports = () => {
+  const handleGenerateIndividualReports = async () => {
     if (filteredData.length === 0) {
       toast({
         title: "Aviso",
@@ -113,8 +115,8 @@ const Index = () => {
     }
 
     // Se um cliente específico foi selecionado, gerar apenas relatório desse cliente
-    // Se não, gerar todos os relatórios individuais
-    generateAllReports(filteredData);
+    // Se não, gerar todos os relatórios individuais (sequencialmente com intervalo)
+    await generateAllReports(filteredData);
 
     const reportType = filters.cliente ? "individual" : "individuais";
     toast({
