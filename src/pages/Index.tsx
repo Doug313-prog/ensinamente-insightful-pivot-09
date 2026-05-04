@@ -217,6 +217,7 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">
               Painel de Análise de Desempenho
             </p>
+            <p className="text-sm text-muted-foreground mt-2">Versão 1.0</p>
           </div>
           
           <div className="max-w-md mx-auto">
@@ -238,6 +239,7 @@ const Index = () => {
             <p className="text-muted-foreground mt-2">
               {filteredData.length} de {data.length} registros sendo exibidos
             </p>
+            <p className="text-xs text-muted-foreground mt-1">Versão 1.0</p>
           </div>
           
           <div className="flex gap-3">
