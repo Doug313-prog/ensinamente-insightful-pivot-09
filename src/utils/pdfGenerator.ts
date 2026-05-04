@@ -39,9 +39,10 @@ Conta: 346645206-2
 CPF: 125.268.738-94
 PIX: irpinhao@gmail.com`,
 
-  'Samya': `Samya de Freitas Bitar - Psicologia
-Nu Pagamentos S.A. Banco 0260  Agência: 001
-Conta: 61619228-6
+  'Samya': `SAMYA DE FREITAS BITAR
+Banco Itaú Unibanco (341)
+Agência: 7457
+Conta: 99195-3
 PIX: 29.712.611/0001-44 CNPJ`,
 
   'Fernanda J': `Fernanda de Fatima Peralta- Psicopedagogia
