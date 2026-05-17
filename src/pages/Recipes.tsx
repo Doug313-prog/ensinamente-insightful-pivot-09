@@ -200,7 +200,22 @@ const Recipes = () => {
       .join('\n');
     const prepTxt = modoPreparo.filter((p) => p.trim()).map((p, i) => `${i + 1}. ${p}`).join('\n');
     const msg = `*${nome || 'Receita'}*\n${tempo ? `⏱ Tempo: ${tempo}\n` : ''}\n*Ingredientes:*\n${ingTxt}\n\n*Modo de Preparo:*\n${prepTxt}\n\n— Receitas da Família e Outras`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    const encoded = encodeURIComponent(msg);
+    const phone = window.prompt(
+      'Digite o número com DDI e DDD (ex: 5511999998888) ou deixe em branco para escolher o contato:',
+      '',
+    );
+    if (phone === null) return;
+    const clean = phone.replace(/\D/g, '');
+    // web.whatsapp.com works on desktop sem bloqueios de api.whatsapp.com
+    const url = clean
+      ? `https://web.whatsapp.com/send?phone=${clean}&text=${encoded}`
+      : `https://web.whatsapp.com/send?text=${encoded}`;
+    try {
+      navigator.clipboard?.writeText(msg);
+      toast({ title: 'Receita copiada!', description: 'Texto também copiado para a área de transferência.' });
+    } catch {}
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const onPhotoUpload = (idx: number, file: File) => {
