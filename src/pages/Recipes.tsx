@@ -320,8 +320,8 @@ const Recipes = () => {
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Footer actions - moved to top */}
-        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
-          <div className="flex flex-wrap items-end gap-4 justify-between">
+        <Card className="px-4 py-2 shadow-card bg-muted/60 border-border print:hidden">
+          <div className="flex flex-wrap items-end gap-3 justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
               <div>
@@ -332,7 +332,7 @@ const Recipes = () => {
                   value={tempo}
                   onChange={(e) => setTempo(e.target.value)}
                   placeholder="Ex: 45 minutos"
-                  className="h-9 w-48"
+                  className="h-8 w-44"
                 />
               </div>
             </div>
