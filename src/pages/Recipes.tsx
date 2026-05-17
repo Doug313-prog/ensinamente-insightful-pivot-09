@@ -304,6 +304,44 @@ const Recipes = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Footer actions - moved to top */}
+        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
+          <div className="flex flex-wrap items-end gap-4 justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block">
+                  Tempo de preparo
+                </label>
+                <Input
+                  value={tempo}
+                  onChange={(e) => setTempo(e.target.value)}
+                  placeholder="Ex: 45 minutos"
+                  className="h-9 w-48"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={salvar} className="bg-gradient-primary hover:opacity-90 font-semibold">
+                <Save className="mr-2 h-4 w-4" /> Salvar
+              </Button>
+              <Button onClick={editar} variant="outline" className="font-semibold">
+                <Edit className="mr-2 h-4 w-4" /> Editar
+              </Button>
+              <Button onClick={imprimir} variant="outline" className="font-semibold">
+                <Printer className="mr-2 h-4 w-4" /> Imprimir
+              </Button>
+              <Button
+                onClick={compartilharWhatsapp}
+                className="bg-[hsl(var(--secondary))] hover:opacity-90 text-secondary-foreground font-semibold"
+              >
+                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
+              </Button>
+            </div>
+          </div>
+        </Card>
+
         {/* Ingredients + Photos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ingredients */}
@@ -418,42 +456,6 @@ const Recipes = () => {
         </Card>
 
         {/* Footer actions */}
-        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
-          <div className="flex flex-wrap items-end gap-4 justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block">
-                  Tempo de preparo
-                </label>
-                <Input
-                  value={tempo}
-                  onChange={(e) => setTempo(e.target.value)}
-                  placeholder="Ex: 45 minutos"
-                  className="h-9 w-48"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={salvar} className="bg-gradient-primary hover:opacity-90 font-semibold">
-                <Save className="mr-2 h-4 w-4" /> Salvar
-              </Button>
-              <Button onClick={editar} variant="outline" className="font-semibold">
-                <Edit className="mr-2 h-4 w-4" /> Editar
-              </Button>
-              <Button onClick={imprimir} variant="outline" className="font-semibold">
-                <Printer className="mr-2 h-4 w-4" /> Imprimir
-              </Button>
-              <Button
-                onClick={compartilharWhatsapp}
-                className="bg-[hsl(var(--secondary))] hover:opacity-90 text-secondary-foreground font-semibold"
-              >
-                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
-              </Button>
-            </div>
-          </div>
-        </Card>
       </main>
     </div>
   );
