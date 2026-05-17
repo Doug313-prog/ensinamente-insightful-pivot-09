@@ -200,7 +200,22 @@ const Recipes = () => {
       .join('\n');
     const prepTxt = modoPreparo.filter((p) => p.trim()).map((p, i) => `${i + 1}. ${p}`).join('\n');
     const msg = `*${nome || 'Receita'}*\n${tempo ? `⏱ Tempo: ${tempo}\n` : ''}\n*Ingredientes:*\n${ingTxt}\n\n*Modo de Preparo:*\n${prepTxt}\n\n— Receitas da Família e Outras`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    const encoded = encodeURIComponent(msg);
+    const phone = window.prompt(
+      'Digite o número com DDI e DDD (ex: 5511999998888) ou deixe em branco para escolher o contato:',
+      '',
+    );
+    if (phone === null) return;
+    const clean = phone.replace(/\D/g, '');
+    // web.whatsapp.com works on desktop sem bloqueios de api.whatsapp.com
+    const url = clean
+      ? `https://web.whatsapp.com/send?phone=${clean}&text=${encoded}`
+      : `https://web.whatsapp.com/send?text=${encoded}`;
+    try {
+      navigator.clipboard?.writeText(msg);
+      toast({ title: 'Receita copiada!', description: 'Texto também copiado para a área de transferência.' });
+    } catch {}
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const onPhotoUpload = (idx: number, file: File) => {
@@ -305,8 +320,8 @@ const Recipes = () => {
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Footer actions - moved to top */}
-        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
-          <div className="flex flex-wrap items-end gap-4 justify-between">
+        <Card className="px-4 py-2 shadow-card bg-[hsl(260_20%_88%)] border-border print:hidden">
+          <div className="flex flex-wrap items-end gap-3 justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
               <div>
@@ -317,7 +332,7 @@ const Recipes = () => {
                   value={tempo}
                   onChange={(e) => setTempo(e.target.value)}
                   placeholder="Ex: 45 minutos"
-                  className="h-9 w-48"
+                  className="h-8 w-44"
                 />
               </div>
             </div>
