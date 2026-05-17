@@ -36,6 +36,81 @@ const emptyIngredients = (): Ingredient[] =>
 const emptyPreparo = (): string[] => Array.from({ length: PREP_ROWS }, () => '');
 const emptyFotos = (): (string | null)[] => Array.from({ length: PHOTO_SLOTS }, () => null);
 
+const pad = <T,>(arr: T[], len: number, filler: T): T[] => [...arr, ...Array.from({ length: Math.max(0, len - arr.length) }, () => filler)].slice(0, len);
+
+const SAMPLE_RECIPES: Recipe[] = [
+  {
+    id: 'sample-bolo-cenoura',
+    nome: 'Bolo de Cenoura com Cobertura de Chocolate',
+    tempo: '50 minutos',
+    ingredientes: pad(
+      [
+        { nome: 'Cenoura média ralada', quantidade: '3', medida: 'xícaras' },
+        { nome: 'Ovos', quantidade: '4', medida: 'xícaras' },
+        { nome: 'Óleo', quantidade: '1', medida: 'xícaras' },
+        { nome: 'Açúcar', quantidade: '2', medida: 'xícaras' },
+        { nome: 'Farinha de trigo', quantidade: '2,5', medida: 'xícaras' },
+        { nome: 'Fermento em pó', quantidade: '1', medida: 'colher de sopa' },
+        { nome: 'Chocolate em pó (cobertura)', quantidade: '4', medida: 'colher de sopa' },
+        { nome: 'Leite (cobertura)', quantidade: '100', medida: 'ml' },
+        { nome: 'Manteiga (cobertura)', quantidade: '1', medida: 'colher de sopa' },
+      ],
+      ING_ROWS,
+      { nome: '', quantidade: '', medida: '' },
+    ),
+    modoPreparo: pad(
+      [
+        'Bata no liquidificador as cenouras, ovos e óleo até ficar homogêneo.',
+        'Em uma tigela, misture a farinha e o açúcar.',
+        'Adicione a mistura do liquidificador e mexa bem.',
+        'Por último, acrescente o fermento delicadamente.',
+        'Asse em forma untada a 180°C por cerca de 40 minutos.',
+        'Para a cobertura: derreta a manteiga, junte o chocolate, açúcar e leite e leve ao fogo até engrossar.',
+        'Despeje a cobertura ainda quente sobre o bolo.',
+      ],
+      PREP_ROWS,
+      '',
+    ),
+    fotos: emptyFotos(),
+    criadoEm: new Date().toISOString(),
+  },
+  {
+    id: 'sample-strogonoff',
+    nome: 'Strogonoff de Frango Cremoso',
+    tempo: '35 minutos',
+    ingredientes: pad(
+      [
+        { nome: 'Peito de frango em cubos', quantidade: '500', medida: 'gramas' },
+        { nome: 'Cebola picada', quantidade: '1', medida: 'xícaras' },
+        { nome: 'Alho amassado', quantidade: '2', medida: 'colher de chá' },
+        { nome: 'Manteiga', quantidade: '2', medida: 'colher de sopa' },
+        { nome: 'Extrato de tomate', quantidade: '3', medida: 'colher de sopa' },
+        { nome: 'Champignon fatiado', quantidade: '200', medida: 'gramas' },
+        { nome: 'Creme de leite', quantidade: '300', medida: 'gramas' },
+        { nome: 'Mostarda', quantidade: '1', medida: 'colher de sopa' },
+        { nome: 'Sal e pimenta a gosto', quantidade: '', medida: '' },
+      ],
+      ING_ROWS,
+      { nome: '', quantidade: '', medida: '' },
+    ),
+    modoPreparo: pad(
+      [
+        'Tempere o frango com sal, pimenta e alho.',
+        'Em uma panela, derreta a manteiga e doure a cebola.',
+        'Adicione o frango e refogue até dourar por completo.',
+        'Acrescente o extrato de tomate e a mostarda, misture bem.',
+        'Junte o champignon e cozinhe por 5 minutos.',
+        'Desligue o fogo e adicione o creme de leite, mexendo até incorporar.',
+        'Sirva com arroz branco e batata palha.',
+      ],
+      PREP_ROWS,
+      '',
+    ),
+    fotos: emptyFotos(),
+    criadoEm: new Date().toISOString(),
+  },
+];
+
 const Recipes = () => {
   const { toast } = useToast();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -52,7 +127,12 @@ const Recipes = () => {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setRecipes(JSON.parse(raw));
+      if (raw) {
+        setRecipes(JSON.parse(raw));
+      } else {
+        setRecipes(SAMPLE_RECIPES);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE_RECIPES));
+      }
     } catch {}
   }, []);
 
@@ -224,6 +304,44 @@ const Recipes = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Footer actions - moved to top */}
+        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
+          <div className="flex flex-wrap items-end gap-4 justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block">
+                  Tempo de preparo
+                </label>
+                <Input
+                  value={tempo}
+                  onChange={(e) => setTempo(e.target.value)}
+                  placeholder="Ex: 45 minutos"
+                  className="h-9 w-48"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={salvar} className="bg-gradient-primary hover:opacity-90 font-semibold">
+                <Save className="mr-2 h-4 w-4" /> Salvar
+              </Button>
+              <Button onClick={editar} variant="outline" className="font-semibold">
+                <Edit className="mr-2 h-4 w-4" /> Editar
+              </Button>
+              <Button onClick={imprimir} variant="outline" className="font-semibold">
+                <Printer className="mr-2 h-4 w-4" /> Imprimir
+              </Button>
+              <Button
+                onClick={compartilharWhatsapp}
+                className="bg-[hsl(var(--secondary))] hover:opacity-90 text-secondary-foreground font-semibold"
+              >
+                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
+              </Button>
+            </div>
+          </div>
+        </Card>
+
         {/* Ingredients + Photos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ingredients */}
@@ -338,42 +456,6 @@ const Recipes = () => {
         </Card>
 
         {/* Footer actions */}
-        <Card className="p-5 shadow-card bg-gradient-card print:hidden">
-          <div className="flex flex-wrap items-end gap-4 justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" />
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block">
-                  Tempo de preparo
-                </label>
-                <Input
-                  value={tempo}
-                  onChange={(e) => setTempo(e.target.value)}
-                  placeholder="Ex: 45 minutos"
-                  className="h-9 w-48"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={salvar} className="bg-gradient-primary hover:opacity-90 font-semibold">
-                <Save className="mr-2 h-4 w-4" /> Salvar
-              </Button>
-              <Button onClick={editar} variant="outline" className="font-semibold">
-                <Edit className="mr-2 h-4 w-4" /> Editar
-              </Button>
-              <Button onClick={imprimir} variant="outline" className="font-semibold">
-                <Printer className="mr-2 h-4 w-4" /> Imprimir
-              </Button>
-              <Button
-                onClick={compartilharWhatsapp}
-                className="bg-[hsl(var(--secondary))] hover:opacity-90 text-secondary-foreground font-semibold"
-              >
-                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
-              </Button>
-            </div>
-          </div>
-        </Card>
       </main>
     </div>
   );
